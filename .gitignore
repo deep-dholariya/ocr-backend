@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+uploads/originals/*
+uploads/processed/*
+uploads/temp/*
+!uploads/originals/.gitkeep
+!uploads/processed/.gitkeep
+!uploads/temp/.gitkeep
