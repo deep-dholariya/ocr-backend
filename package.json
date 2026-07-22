@@ -12,8 +12,6 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@google/genai": "^2.13.0",
-    "@google/generative-ai": "^0.24.1",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
