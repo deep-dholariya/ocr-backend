@@ -38,14 +38,23 @@ class PythonService {
               method: "POST",
               body: form,
               signal: controller.signal,
-            }
+            },
           );
 
           let result;
 
           try {
-            result = await response.json();
-          } catch {
+            console.log("STATUS:", response.status);
+
+            const text = await response.text();
+
+            console.log("RAW PYTHON RESPONSE:");
+            console.log(text);
+
+            result = JSON.parse(text);
+          } catch (error) {
+            console.log("JSON ERROR:", error.message);
+
             return reject(new Error("Invalid JSON received from Python OCR."));
           }
 
@@ -53,8 +62,8 @@ class PythonService {
             return reject(
               new Error(
                 result.error ||
-                  `Python OCR service responded with status ${response.status}.`
-              )
+                  `Python OCR service responded with status ${response.status}.`,
+              ),
             );
           }
 
@@ -63,12 +72,14 @@ class PythonService {
           if (error.name === "AbortError") {
             return reject(
               new ApiTimeoutError(
-                `OCR processing timed out after ${env.OCR_TIMEOUT_MS}ms.`
-              )
+                `OCR processing timed out after ${env.OCR_TIMEOUT_MS}ms.`,
+              ),
             );
           }
 
-          reject(new Error(`Failed to reach Python OCR service: ${error.message}`));
+          reject(
+            new Error(`Failed to reach Python OCR service: ${error.message}`),
+          );
         } finally {
           clearTimeout(timer);
         }
