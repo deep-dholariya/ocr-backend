@@ -12,6 +12,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@google/genai": "^2.13.0",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -24,7 +25,6 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.6.0",
     "multer": "^2.2.0",
-    "openai": "^6.48.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0"
   },

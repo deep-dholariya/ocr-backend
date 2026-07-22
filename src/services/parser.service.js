@@ -2,16 +2,15 @@
  * ============================================================
  * Business Card Parser Service
  * ------------------------------------------------------------
- * Uses OpenAI (gpt-5-mini) as the sole parsing engine to turn
- * raw OCR text into structured business-card fields.
+ * Uses Google Gemini (gemini-2.0-flash) as the sole parsing
+ * engine to turn raw OCR text into structured business-card
+ * fields.
  * ============================================================
  */
 
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+const client = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const SYSTEM_PROMPT = `You are an expert business card parser.
 
@@ -81,7 +80,7 @@ Return:
 
   /**
    * Parse raw OCR text into structured business-card fields
-   * using OpenAI as the sole extraction engine.
+   * using Gemini as the sole extraction engine.
    * @param {string} rawText - raw text from an OCR engine
    * @param {object} [options] - reserved for future use
    * @returns {Promise<object>} structured result (never throws)
@@ -91,29 +90,32 @@ Return:
       return { success: false, error: "Empty OCR text." };
     }
 
-    console.log("[ParserService] OpenAI request start");
+    console.log("[ParserService] Gemini request start");
 
     let response;
     try {
-      response = await client.chat.completions.create({
-        model: "gpt-5-mini",
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: this.buildUserPrompt(rawText) }
-        ]
+      const model = client.getGenerativeModel({
+        model: "gemini-2.0-flash",
+        systemInstruction: SYSTEM_PROMPT,
+        generationConfig: {
+          responseMimeType: "application/json"
+        }
       });
 
-      console.log("[ParserService] OpenAI request success");
+      const result = await model.generateContent(this.buildUserPrompt(rawText));
+      response = result?.response;
+
+      console.log("[ParserService] Gemini request success");
     } catch (err) {
       console.error(
-        "[ParserService] OpenAI request failure:",
+        "[ParserService] Gemini request failure:",
         err && err.message ? err.message : err
       );
       return { success: false, error: "Invalid AI response." };
     }
 
     try {
-      const raw = response?.choices?.[0]?.message?.content ?? "";
+      const raw = response?.text ? response.text() : "";
       const cleaned = this.stripMarkdownFences(raw);
       const parsed = JSON.parse(cleaned);
 
