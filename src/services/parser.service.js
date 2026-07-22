@@ -548,4 +548,6 @@ function parseBusinessCard(rawText) {
   }
 }
 
-module.exports = { parseBusinessCard };
+export default {
+  parseBusinessCard,
+};
